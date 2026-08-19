@@ -1,0 +1,41 @@
+<?php
+/**
+ * Kurage CRM Agent の設定。
+ * このファイルを kcrmagent_config.php にコピーして編集してください(.exampleのままでは読み込まれません)。
+ *
+ * 【この製品の考え方】
+ * 営業は日報を投げるだけ。AIが下書きに起票し、人が承認したものだけが台帳に載ります。
+ * AIは台帳に直接書けません(ソース内の kca_can() が関門です)。
+ * 変えたいことがあれば、このファイルを Claude Code などのAIエージェントに見せて頼めば安全に書き換えてくれます。
+ */
+
+// ---- 画面 ----
+define('KCA_TITLE',       '営業台帳(Kurage CRM Agent)');
+define('KCA_BRAND_COLOR', '#1b6d8c');
+
+// ---- ログイン ----
+// どちらか一方でよい。KCA_PASSWORD_HASH(password_hash()の値)があればそちらが優先。
+define('KCA_PASSWORD',      '');        // 平文パスワード(手軽だが本番はHASH推奨)
+define('KCA_PASSWORD_HASH', '');        // php -r "echo password_hash('パスワード', PASSWORD_DEFAULT);"
+
+// ---- 外部API(メール転送・チャット連携から日報を投入する入口) ----
+// POST {url}?api=report  ヘッダ X-KCA-TOKEN: この値  本文 {"report":"日報テキスト"}
+// 空にするとAPIは無効。台帳への反映は必ず管理画面での承認が必要です。
+define('KCA_API_TOKEN', '');
+
+// ---- AI(OpenAI互換API) ----
+// 既定はDeepSeek。OpenAI等に変える場合は KCA_API_BASE と KCA_MODEL を差し替えるだけ。
+define('KCA_API_BASE', 'https://api.deepseek.com');
+define('KCA_API_KEY',  'sk-xxxx');                  // ★あなたのAPIキーに置き換え
+define('KCA_MODEL',    'deepseek-chat');            // 非推論モデル推奨(速く安定)
+
+// ---- 営業フローに合わせる ----
+define('KCA_STAGES',    '新規,提案中,受注,失注');    // 商談ステージ(先頭=初期値。末尾2つは終了扱い)
+define('KCA_ACT_TYPES', '訪問,電話,メール,オンライン,メモ'); // 活動の種別
+
+// ---- 利用制限 ----
+define('KCA_RATE_PER_HOUR', 20);    // 同一IPが1時間にAI解析できる回数(API費用の防波堤)
+define('KCA_INPUT_MAX',     2000);  // 日報1通の最大文字数
+
+// ---- デモモード(制限強化+バッジ表示) ----
+define('KCA_DEMO', false);
