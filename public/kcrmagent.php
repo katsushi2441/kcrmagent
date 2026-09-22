@@ -902,4 +902,5 @@ $nActsMonth = (int)$pdo->query("SELECT COUNT(*) FROM activities WHERE at_date >=
 })();
 </script>
 <?php endif; ?>
+<?php if (($_SERVER['HTTP_HOST'] ?? '') === 'proto.exbridge.jp'): ?><p style="text-align:center;font-size:13px;margin:14px 0;color:#5d6b7a">これはデモです。<a href="https://kappstore.exbridge.jp/app.php?id=f6fab083d826739f&amp;ref=kcrmagent" target="_blank" rel="noopener">この製品をオンプレミスで導入する（商品ページ）</a></p><?php endif; ?>
 </body></html>
