@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 # デモの公開。https://proto.exbridge.jp/kcrmagent/
-# DeepSeekキーとAPIトークンはこのスクリプトが注入する(リポジトリに置かない)。
+# デモの AI は gemma4。共通の gemma4 中継(:18343)の合言葉と APIトークンをこのスクリプトが注入する(リポジトリに置かない)。
+# **デモで DeepSeek を使わない**(有料サービス専用。2026-09-29 まで DeepSeek のキーを入れていた)。
 set -euo pipefail
 cd "$(dirname "$0")/.."
 php scripts/check_kcrmagent.php >/dev/null || { echo "自己テスト失敗→デプロイ中止" >&2; exit 1; }
 set -a; . /home/kojima/work/aixec/.env; set +a
-KEY=$(grep -m1 '^KCBRAIN_DEEPSEEK_API_KEY=' /home/kojima/work/kcbrain/.env | cut -d= -f2)
-[ -n "$KEY" ] || { echo "DeepSeekキーが見つからない" >&2; exit 1; }
+KEY=$(grep -m1 '^RELAY_CLIENT_KCRMAGENT=' /home/kojima/work/kaima/.env | cut -d= -f2)
+[ -n "$KEY" ] || { echo "中継の合言葉が見つからない(kaima/.env の RELAY_CLIENT_KCRMAGENT)" >&2; exit 1; }
+grep -q "api.deepseek.com" demo/kcrmagent_config.php && { echo "デモの設定が DeepSeek を向いている。止める" >&2; exit 1; }
+curl -s -m 10 http://127.0.0.1:18343/healthz | grep -q kcrmagent || { echo "共通の gemma4 中継(18343)に kcrmagent が登録されていない" >&2; exit 1; }
 APITOKEN=$(grep -m1 '^KCA_DEMO_API_TOKEN=' .env | cut -d= -f2)
 [ -n "$APITOKEN" ] || { echo "KCA_DEMO_API_TOKEN が .env にない" >&2; exit 1; }
 remote="/web/proto_exbridge_jp/kcrmagent"
